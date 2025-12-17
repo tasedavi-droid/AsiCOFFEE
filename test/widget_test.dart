@@ -14,7 +14,7 @@ class AsiCoffeeApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'AsiCoffee',
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFFFF7F2),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       home: const HomePage(),
@@ -22,12 +22,14 @@ class AsiCoffeeApp extends StatelessWidget {
   }
 }
 
-// MODELO DO CAFÉ
+// MODEL
 class Coffee {
   final String name;
   final double price;
   final String image;
   final String category;
+  final bool isFeatured; // 🔥 DIFERENCIAL
+
   bool isFavorite;
 
   Coffee({
@@ -35,11 +37,11 @@ class Coffee {
     required this.price,
     required this.image,
     required this.category,
+    this.isFeatured = false,
     this.isFavorite = false,
   });
 }
 
-// TELA PRINCIPAL
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -48,7 +50,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Coffee> coffeeList = [
+  final List<Coffee> coffees = [
     Coffee(
       name: 'Espresso',
       price: 5.00,
@@ -60,6 +62,7 @@ class _HomePageState extends State<HomePage> {
       price: 8.50,
       image: 'assets/images/cappuccino.jpg',
       category: 'Cremoso',
+      isFeatured: true, // ⭐ Destaque EJ
     ),
     Coffee(
       name: 'Latte',
@@ -77,99 +80,123 @@ class _HomePageState extends State<HomePage> {
       name: 'Americano',
       price: 6.00,
       image: 'assets/images/americano.jpg',
-      category: 'Suave',
+      category: 'Forte',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF7F2),
       appBar: AppBar(
         title: const Text('AsiCoffee ☕'),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.black,
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: coffeeList.length,
+        itemCount: coffees.length,
         itemBuilder: (context, index) {
-          final coffee = coffeeList[index];
+          final coffee = coffees[index];
 
-          return Container(
+          return Card(
             margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEFE6),
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 6,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    coffee.image,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  // IMAGEM
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      coffee.image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        coffee.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(width: 12),
+
+                  // INFO
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              coffee.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            // ⭐ BADGE DIFERENCIAL
+                            if (coffee.isFeatured)
+                              Container(
+                                margin: const EdgeInsets.only(left: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.brown,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Destaque EJ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      Text(
-                        'R\$ ${coffee.price.toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                        Text(
+                          'R\$ ${coffee.price.toStringAsFixed(2)}',
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.brown.shade200,
-                          borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.brown.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            coffee.category,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
-                        child: Text(
-                          coffee.category,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    coffee.isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color: coffee.isFavorite ? Colors.red : Colors.grey,
+
+                  // FAVORITO
+                  IconButton(
+                    icon: Icon(
+                      coffee.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: coffee.isFavorite ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        coffee.isFavorite = !coffee.isFavorite;
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      coffee.isFavorite = !coffee.isFavorite;
-                    });
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
