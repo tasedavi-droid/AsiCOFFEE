@@ -14,7 +14,6 @@ class AsiCoffeeApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'AsiCoffee',
       theme: ThemeData(
-        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
@@ -23,28 +22,26 @@ class AsiCoffeeApp extends StatelessWidget {
   }
 }
 
-/* =========================
-   MODEL
-========================= */
-class CoffeeItem {
+// MODEL
+class Coffee {
   final String name;
   final double price;
-  final String imageUrl;
+  final String image;
   final String category;
+  final bool isFeatured; // 🔥 DIFERENCIAL
+
   bool isFavorite;
 
-  CoffeeItem({
+  Coffee({
     required this.name,
     required this.price,
-    required this.imageUrl,
+    required this.image,
     required this.category,
+    this.isFeatured = false,
     this.isFavorite = false,
   });
 }
 
-/* =========================
-   HOME PAGE
-========================= */
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -53,46 +50,62 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<CoffeeItem> coffeeList = [
-    CoffeeItem(
+  final List<Coffee> coffees = [
+    Coffee(
       name: 'Espresso',
       price: 5.00,
+      image: 'assets/images/espresso.jpg',
       category: 'Tradicional',
-      imageUrl:
-          'https://images.unsplash.com/photo-1511920170033-f8396924c348',
     ),
-    CoffeeItem(
+    Coffee(
       name: 'Cappuccino',
       price: 8.50,
+      image: 'assets/images/cappuccino.jpg',
       category: 'Cremoso',
-      imageUrl:
-          'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
+      isFeatured: true, // ⭐ Destaque EJ
     ),
-    CoffeeItem(
+    Coffee(
       name: 'Latte',
       price: 7.50,
+      image: 'assets/images/latte.jpg',
       category: 'Leve',
-      imageUrl:
-          'https://images.unsplash.com/photo-1523942839745-7848d7d5c66c',
+    ),
+    Coffee(
+      name: 'Mocha',
+      price: 9.00,
+      image: 'assets/images/mocha.jpg',
+      category: 'Doce',
+    ),
+    Coffee(
+      name: 'Americano',
+      price: 6.00,
+      image: 'assets/images/americano.jpg',
+      category: 'Forte',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF7F2),
       appBar: AppBar(
         title: const Text('AsiCoffee ☕'),
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: coffeeList.length,
+        padding: const EdgeInsets.all(16),
+        itemCount: coffees.length,
         itemBuilder: (context, index) {
-          final item = coffeeList[index];
+          final coffee = coffees[index];
 
           return Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             elevation: 3,
-            margin: const EdgeInsets.only(bottom: 12),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
@@ -100,8 +113,8 @@ class _HomePageState extends State<HomePage> {
                   // IMAGEM
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      item.imageUrl,
+                    child: Image.asset(
+                      coffee.image,
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
@@ -109,46 +122,76 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(width: 12),
 
-                  // TEXTO
+                  // INFO
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          item.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              coffee.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            // ⭐ BADGE DIFERENCIAL
+                            if (coffee.isFeatured)
+                              Container(
+                                margin: const EdgeInsets.only(left: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.brown,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Destaque EJ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
                         Text(
-                          'R\$ ${item.price.toStringAsFixed(2)}',
+                          'R\$ ${coffee.price.toStringAsFixed(2)}',
                         ),
                         const SizedBox(height: 6),
-                        Chip(
-                          label: Text(item.category),
-                          backgroundColor: Colors.brown.shade100,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.brown.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            coffee.category,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  // FAVORITO (DIFERENCIAL COM ANIMAÇÃO)
+                  // FAVORITO
                   IconButton(
-                    icon: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: Icon(
-                        item.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        key: ValueKey(item.isFavorite),
-                        color: item.isFavorite ? Colors.red : Colors.grey,
-                      ),
+                    icon: Icon(
+                      coffee.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: coffee.isFavorite ? Colors.red : Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {
-                        item.isFavorite = !item.isFavorite;
+                        coffee.isFavorite = !coffee.isFavorite;
                       });
                     },
                   ),
