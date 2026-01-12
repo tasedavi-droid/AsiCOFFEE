@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../models/coffee.dart';
 import '../providers/coffee_provider.dart';
 
@@ -14,13 +15,15 @@ class AddCoffeeModal extends ConsumerStatefulWidget {
 
 class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
   final _formKey = GlobalKey<FormState>();
-  final picker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
 
   String name = '';
   String description = '';
   double price = 0;
   String category = 'Café';
   DateTime? launchDate;
+
+  bool glutenFree = true;
 
   String imagePath = 'assets/images/espresso.jpg';
   bool isAssetImage = true;
@@ -61,13 +64,16 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            // PREVIEW DA IMAGEM
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: isAssetImage
-                    ? Image.asset(imagePath, height: 120)
-                    : Image.file(File(imagePath), height: 120),
+                    ? Image.asset(imagePath, height: 120, fit: BoxFit.cover)
+                    : Image.file(
+                        File(imagePath),
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
 
@@ -79,13 +85,13 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
 
             TextFormField(
               decoration: const InputDecoration(labelText: 'Nome'),
-              validator: (v) => v!.isEmpty ? 'Obrigatório' : null,
+              validator: (v) => v == null || v.isEmpty ? 'Obrigatório' : null,
               onSaved: (v) => name = v!,
             ),
 
             TextFormField(
               decoration: const InputDecoration(labelText: 'Descrição'),
-              validator: (v) => v!.isEmpty ? 'Obrigatório' : null,
+              validator: (v) => v == null || v.isEmpty ? 'Obrigatório' : null,
               onSaved: (v) => description = v!,
             ),
 
@@ -93,7 +99,7 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
               decoration: const InputDecoration(labelText: 'Preço'),
               keyboardType: TextInputType.number,
               validator: (v) =>
-                  double.tryParse(v!) == null || double.parse(v) <= 0
+                  double.tryParse(v ?? '') == null || double.parse(v!) <= 0
                       ? 'Preço inválido'
                       : null,
               onSaved: (v) => price = double.parse(v!),
@@ -101,6 +107,7 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
 
             DropdownButtonFormField<String>(
               initialValue: category,
+              decoration: const InputDecoration(labelText: 'Categoria'),
               items: const [
                 DropdownMenuItem(value: 'Café', child: Text('Café')),
                 DropdownMenuItem(value: 'Lanche', child: Text('Lanche')),
@@ -108,7 +115,12 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
                 DropdownMenuItem(value: 'Chá', child: Text('Chá')),
               ],
               onChanged: (v) => category = v!,
-              decoration: const InputDecoration(labelText: 'Categoria'),
+            ),
+
+            SwitchListTile(
+              title: const Text('Sem glúten'),
+              value: glutenFree,
+              onChanged: (v) => setState(() => glutenFree = v),
             ),
 
             TextButton.icon(
@@ -121,7 +133,7 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
               onPressed: pickDate,
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             ElevatedButton(
               child: const Text('Salvar'),
@@ -136,9 +148,10 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
                           description: description,
                           price: price,
                           category: category,
-                          launchDate: launchDate!,
                           imagePath: imagePath,
+                          launchDate: launchDate!,
                           isAssetImage: isAssetImage,
+                          glutenFree: glutenFree,
                         ),
                       );
 

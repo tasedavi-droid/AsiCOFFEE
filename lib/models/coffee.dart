@@ -4,12 +4,12 @@ class Coffee {
   final double price;
   final String category;
   final DateTime launchDate;
-  final bool glutenFree;
 
   final String imagePath;
   final bool isAssetImage;
 
-  bool isFavorite;
+  final bool glutenFree;
+  final bool isFavorite;
 
   Coffee({
     required this.name,
@@ -18,8 +18,24 @@ class Coffee {
     required this.category,
     required this.launchDate,
     required this.imagePath,
-    this.isAssetImage = true,
+    required this.isAssetImage,
     this.glutenFree = false,
     this.isFavorite = false,
   });
+
+  Coffee copyWith({
+    bool? isFavorite,
+  }) {
+    return Coffee(
+      name: name,
+      description: description,
+      price: price,
+      category: category,
+      launchDate: launchDate,
+      imagePath: imagePath,
+      isAssetImage: isAssetImage,
+      glutenFree: glutenFree,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
 }
