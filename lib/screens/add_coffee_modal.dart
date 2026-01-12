@@ -100,7 +100,7 @@ class _AddCoffeeModalState extends ConsumerState<AddCoffeeModal> {
             ),
 
             DropdownButtonFormField<String>(
-              value: category,
+              initialValue: category,
               items: const [
                 DropdownMenuItem(value: 'Café', child: Text('Café')),
                 DropdownMenuItem(value: 'Lanche', child: Text('Lanche')),

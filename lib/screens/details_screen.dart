@@ -17,7 +17,7 @@ class DetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // IMAGEM (asset ou galeria)
+            // IMAGEM 
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: coffee.isAssetImage

@@ -22,7 +22,9 @@ class CoffeeList extends ConsumerWidget {
       if (onlyCoffee && c.category != 'Café') return false;
       if (glutenFree && !c.glutenFree) return false;
       if (search.isNotEmpty &&
-          !c.name.toLowerCase().contains(search)) return false;
+          !c.name.toLowerCase().contains(search)) {
+        return false;
+      }
       return true;
     }).toList();
 

@@ -40,7 +40,7 @@ class CoffeeCard extends ConsumerWidget {
           },
           child: Row(
             children: [
-              // IMAGEM GRANDE (ESTILO ORIGINAL)
+              // IMAGEM GRANDE 
               ClipRRect(
                 borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(16),
